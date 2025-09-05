@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>예약 달력</title>
+  <style>
+    body {
+      font-family: 'Pretendard', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #ffecd2, #fcb69f);
+      margin: 0;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 600px;
+      width: 100%;
+      overflow-y: auto;
+      max-height: 90vh;
+    }
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    input[type="date"], select, input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid #fcb69f;
+      border-radius: 10px;
+      margin: 10px 0;
+      width: 80%;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 25px;
+      font-size: 18px;
+      background: #ff6f61;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    button:hover {
+      transform: scale(1.05);
+      background: #e85a50;
+    }
+    .message {
+      margin-top: 25px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #ff6f61;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.6s ease;
+    }
+    .message.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* 풍선 애니메이션 */
+    .balloon {
+      position: fixed;
+      bottom: 0;
+      width: 50px;
+      height: 65px;
+      border-radius: 50%;
+      background: red;
+      animation: float 6s linear forwards;
+    }
+    .balloon::after {
+      content: "";
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      width: 2px;
+      height: 20px;
+      background: #555;
+      transform: translateX(-50%);
+    }
+    @keyframes float {
+      0% { transform: translate(0,0) scale(1); opacity: 1; }
+      100% { transform: translate(var(--x), -110vh) scale(1.1); opacity: 0; }
+    }
+
+    /* 폭죽 효과 */
+    .explosion {
+      position: fixed;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: yellow;
+      animation: explode 1s ease-out forwards;
+    }
+    @keyframes explode {
+      from { transform: scale(1) translate(0,0); opacity: 1; }
+      to { transform: scale(0.5) translate(var(--x), var(--y)); opacity: 0; }
+    }
+
+    .notice {
+      text-align: left;
+      margin-top: 40px;
+      padding: 20px;
+      border-top: 2px solid #eee;
+      font-size: 14px;
+      color: #555;
+    }
+    .notice h2 {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+/* 상단 배너 영역 */
+.banner {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 20px;
+  background: #fff;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.banner-img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.banner-info {
+  padding: 20px;
+  text-align: center;
+}
+
+.banner-info h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.banner-info p {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+
+
+  </style>
+</head>
+<body>
+  
+
+  <div class="container">
+    <!-- 상단 약속 안내 영역 -->
+<div class="banner">
+  <img src="https://ifh.cc/g/dPnfnP.jpg" alt="약속 안내 이미지" class="banner-img">
+
+  <div class="banner-info">
+    <h2>예약 행위 중독자 치료 프로그램</h2>
+    <p>치료비: 하이디라오 식사권<br>
+       네이버예약 행위 중독, 팝마트 깡 중독, 티켓팅 중독자를 위한 프로그램입니다<br><br>
+       <b>참여대상:</b> 데이식스콘서트티켓팅, 아이유팬미팅티켓팅, 라부부구매응모, 라부부카톡선물하기참전, 라부부스스글팝팝코구매티켓팅, 라부부네이버예약, 데이식스팝업네이버예약, 아이유팝업예약, CGV용포디예약, 무대인사티켓팅 등 각종 티켓팅 참전 이력 보유자</p>
+  </div>
+</div>
+    <h1>📅 Dr.익영민과의 약속 예약 📅</h1>
+    <input type="date" id="datePicker"><br>
+
+    <select id="timePicker">
+      <option value="">시간을 선택하세요</option>
+      <option>오전 10:30</option><option>오전 11:00</option><option>오전 11:30</option>
+      <option>오후 12:00</option><option>오후 12:30</option><option>오후 1:00</option>
+      <option>오후 1:30</option><option>오후 2:00</option><option>오후 2:30</option>
+      <option>오후 3:00</option><option>오후 3:30</option><option>오후 4:00</option>
+      <option>오후 4:30</option><option>오후 5:00</option><option>오후 5:30</option>
+      <option>오후 6:00</option><option>오후 7:00</option>
+      <option>오후 7:30</option><option>오후 8:00</option><option>오후 8:30</option>
+      <option>오후 9:00</option><option>오후 9:30</option>
+    </select><br>
+
+    <input type="text" id="name" placeholder="예약자 이름"><br>
+    <input type="text" id="note" placeholder="메모 (선택)"><br>
+
+    <button onclick="makeReservation()">예약하기</button>
+    <div class="message" id="message">🎉 예약이 완료되었습니다! 🎈</div>
+
+    <div class="notice">
+      <h2>예약 전 유의사항</h2>
+      <p id="noticeText">안녕하세요?<br>예약 중독자 치료 프로그램을 운영하는 티켓팅중독학위 박사 익영민입니다.<br><br>치료 프로그램은 다음과 같은 순서로 진행됩니다.<br><br><b>1. 먼저 반응 속도 테스트를 진행하여 중독자의 티켓팅 기본실력을 측정합니다.</b><br>반응 속도 테스트는 하이디라오에서 이루어집니다.<br>수타면을 주문한 후 수타면이 얼굴에 닿는 순간 몇 초만에 피할 수 있는지 측정합니다.<br><br><b>2. 하이디라오에서 배부르게 식사 후 팝마트 홀박스 깡을 진행합니다.</b><br>스컬판다, 라부부, 작은별, 비키니시티, 크라이베이비 홀박스 중 하나의 박스를 선택하여 진행합니다.<br>다만, 시크릿이 나오지 않는다면 시크릿이 나올때까지 깡 합니다.<br>해당 비용은 중독자 본인이 지불합니다.<br><br><b>3. 매진된 네이버예약 창에서 취켓팅을 진행합니다.</b><br>랜덤 시간에 하나의 회차가 랜덤으로 풀리며 해당 회차 예약을 확정시켜야 합니다.<br>만약 간소화페이지로 이동하게 된다면 실패입니다.<br>간소화페이지를 뚫고 예약 확정이 완료 될 때까지 진행합니다.<br><br><b>4. 실전 투입</b><br>멜론티켓에서 진행되는 NCT위시 티켓팅에 당당하게 참전합니다.<br>하나의 자리를 확보할 때까지 중단할 수 없습니다.<br><br>모든 프로그램을 이수하면 도파민중독 박사학위를 드립니다.<br>감사합니다.<br><br>티켓팅중독 Dr.익영민</p>
+    </div>
+  </div>
+
+  <script>
+    function makeReservation() {
+      const date = document.getElementById('datePicker').value;
+      const time = document.getElementById('timePicker').value;
+      const name = document.getElementById('name').value;
+      const msg = document.getElementById('message');
+
+      if (!date || !time || !name) {
+        alert('날짜, 시간, 이름을 모두 입력해주세요!');
+        return;
+      }
+
+      msg.textContent = `🎉 ${name}님의 ${date} ${time} 예약이 완료되었습니다! 🎈`;
+      msg.classList.add('show');
+
+      // 풍선 여러 개 생성
+      for (let i = 0; i < 15; i++) {
+        createBalloon();
+      }
+      // 폭죽 여러 개 생성
+      for (let i = 0; i < 25; i++) {
+        createExplosion();
+      }
+    }
+
+    function createBalloon() {
+      const balloon = document.createElement('div');
+      balloon.classList.add('balloon');
+      balloon.style.left = Math.random() * 100 + 'vw';
+      balloon.style.setProperty('--x', (Math.random() * 100 - 50) + 'px');
+      balloon.style.background = `hsl(${Math.random() * 360}, 80%, 60%)`;
+      document.body.appendChild(balloon);
+      setTimeout(() => balloon.remove(), 6000);
+    }
+
+    function createExplosion() {
+      const exp = document.createElement('div');
+      exp.classList.add('explosion');
+      exp.style.left = 50 + 'vw';
+      exp.style.top = 50 + 'vh';
+      const angle = Math.random() * 2 * Math.PI;
+      const distance = Math.random() * 200 + 50;
+      exp.style.setProperty('--x', Math.cos(angle) * distance + 'px');
+      exp.style.setProperty('--y', Math.sin(angle) * distance + 'px');
+      exp.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+      document.body.appendChild(exp);
+      setTimeout(() => exp.remove(), 1000);
+    }
+  </script>
+</body>
+</html>
